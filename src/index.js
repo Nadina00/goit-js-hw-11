@@ -75,12 +75,11 @@ async function onSubmit(evt){
      try {
       newsImadges.fetchImage().then(data => {return data.totalHits})
       .then(totalHits =>{
-      if (totalHits > 40) {
-        Notify.success(`Hooray! We found ${totalHits} images.`);
-               
-        }  else { 
-    Notify.success(`We're sorry, but you've reached the end of search results.`);
-    btnMore.classList.add("is-hidden")  }
+        if ((totalHits - 40) < 40) { 
+          btnMore.classList.add("is-hidden")  
+          Notify.success(`We're sorry, but you've reached the end of search results.`);
+         } else {Notify.success(`Hooray! We found ${totalHits} images.`);
+          lightbox.refresh();}
      })
     }
     catch (error) {
