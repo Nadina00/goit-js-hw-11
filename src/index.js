@@ -26,7 +26,7 @@ let lightbox = new SimpleLightbox('.photo-card a', {
 async function onSubmit(evt){
   evt.preventDefault()
   clearHits();
-  newsImadges.name = input.value;
+  newsImadges.name = input.value.trim();
     if(newsImadges.name === ""){
     alertNotFound()
     return
@@ -34,20 +34,24 @@ async function onSubmit(evt){
   newsImadges.resetPage();
   btnMore.classList.remove("is-hidden")
   newsImadges.fetchImage()
-  .then(result => {
-    return result.hits
+  .then(data => {
+    return data.hits
   })
-  .then(hits => {createMarkup(hits)
+  .then(hits => {gallery.innerHTML = createMarkup(hits)
     lightbox.refresh();})
   newsImadges.resetPage(); 
   try {
-    newsImadges.fetchImage().then(result => {return result.totalHits})
+    newsImadges.fetchImage().then(data => {return data.totalHits})
     .then(totalHits =>{
    
     if (totalHits === 0) {
-      gallery.innerHTML = '';
+      clearHits();
       Notify.failure('Sorry, there are no images matching your search query. Please try again.');
       btnMore.classList.add('is-hidden');}
+      else if(totalHits < 40){
+        btnMore.classList.add("is-hidden");
+        Notify.success(`Hooray! We found ${totalHits} images.`);
+      }
       else{
         Notify.success(`Hooray! We found ${totalHits} images.`);
       }
@@ -63,13 +67,13 @@ async function onSubmit(evt){
   function onSubmitMore(evt){
     
   newsImadges.fetchImage()
-  .then(result => {return result.hits })
-  .then(hits => {createMarkup(hits);
+  .then(data => {return data.hits })
+  .then(hits => {gallery.insertAdjacentHTML("beforeend", createMarkup(hits));
   lightbox.refresh();
     })
   
      try {
-      newsImadges.fetchImage().then(result => {return result.totalHits})
+      newsImadges.fetchImage().then(data => {return data.totalHits})
       .then(totalHits =>{
       if (totalHits > 40) {
         Notify.success(`Hooray! We found ${totalHits} images.`);
@@ -110,7 +114,7 @@ function createMarkup(hits){
          </p>
        </div>
      </div>`;}).join("");
-    return gallery.innerHTML =  markup;
+    return markup;
      
  };
 
